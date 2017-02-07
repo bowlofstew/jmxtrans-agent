@@ -52,12 +52,13 @@ public class PerMinuteSummarizerOutputWriter extends AbstractOutputWriter implem
 
     @Override
     public void writeInvocationResult(@Nonnull String invocationName, @Nullable Object value) throws IOException {
+        if(!enabled) return;
         delegate.writeInvocationResult(invocationName, value);
     }
 
     @Override
     public void writeQueryResult(@Nonnull String metricName, @Nullable String metricType, @Nullable Object value) throws IOException {
-
+        if(!enabled) return;
         QueryResult currentResult = new QueryResult(metricName, metricType, value, System.currentTimeMillis());
 
         if ("counter".equals(currentResult.getType())) {
@@ -198,6 +199,7 @@ public class PerMinuteSummarizerOutputWriter extends AbstractOutputWriter implem
     @Override
     public void postConstruct(@Nonnull Map<String, String> settings) {
         super.postConstruct(settings);
+        if(!enabled) return;
         delegate.postConstruct(settings);
     }
 
@@ -209,12 +211,14 @@ public class PerMinuteSummarizerOutputWriter extends AbstractOutputWriter implem
 
     @Override
     public void postCollect() throws IOException {
+        if(!enabled) return;
         super.postCollect();
         delegate.postCollect();
     }
 
     @Override
     public void preCollect() throws IOException {
+        if(!enabled) return;
         super.preCollect();
         delegate.preCollect();
     }

@@ -56,6 +56,8 @@ public class LibratoWriter extends AbstractOutputWriter implements OutputWriter 
 
     @Override
     public synchronized void postConstruct(Map<String, String> settings) {
+        super.postConstruct(settings);
+        if(!enabled) return;
         final String username = ConfigurationUtils.getString(settings, SETTING_USERNAME);
         final String token = ConfigurationUtils.getString(settings, SETTING_TOKEN);
         if (username == null || token == null) {
@@ -78,15 +80,18 @@ public class LibratoWriter extends AbstractOutputWriter implements OutputWriter 
 
     @Override
     public void postCollect() throws IOException {
+        if(!enabled) return;
     }
 
     @Override
     public void writeInvocationResult(String invocationName, Object value) throws IOException {
+        if(!enabled) return;
         writeQueryResult(invocationName, null, value);
     }
 
     @Override
     public synchronized void writeQueryResult(String metricName, String metricType, Object value) throws IOException {
+        if(!enabled) return;
         HttpURLConnection urlConnection;
         try {
             urlConnection = (HttpURLConnection) url.openConnection();

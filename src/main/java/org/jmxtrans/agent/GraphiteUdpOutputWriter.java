@@ -56,6 +56,7 @@ public class GraphiteUdpOutputWriter extends AbstractOutputWriter {
     @Override
     public void postConstruct(Map<String, String> settings) {
         super.postConstruct(settings);
+        if(!enabled) return;
         graphiteServerHostAndPort = getHostAndPort(settings);
         messageBuilder = new GraphiteMetricMessageBuilder(getConfiguredMetricPrefixOrNull(settings));
         messageSender = new UdpMessageSender(graphiteServerHostAndPort);
@@ -66,11 +67,13 @@ public class GraphiteUdpOutputWriter extends AbstractOutputWriter {
 
     @Override
     public void writeInvocationResult(String invocationName, Object value) throws IOException {
+        if(!enabled) return;
         writeQueryResult(invocationName, null, value);
     }
 
     @Override
     public void writeQueryResult(String metricName, String metricType, Object value) throws IOException {
+        if(!enabled) return;
         String msg = messageBuilder.buildMessage(metricName, value, TimeUnit.SECONDS.convert(clock.getCurrentTimeMillis(), TimeUnit.MILLISECONDS));
         logMessageIfTraceLoggable(msg);
         tryWriteMsg(msg + "\n");

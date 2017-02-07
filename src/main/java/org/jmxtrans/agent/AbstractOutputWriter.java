@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
 
+import static org.jmxtrans.agent.util.ConfigurationUtils.getBoolean;
 import static org.jmxtrans.agent.util.ConfigurationUtils.getString;
 
 /**
@@ -43,15 +44,18 @@ public abstract class AbstractOutputWriter implements OutputWriter {
      *
      * Supported values are {@code INFO}
      */
+    public final static String SETTING_ENABLED = "enabled";
     public final static String SETTING_LOG_LEVEL = "logLevel";
     public final static String SETTING_LOG_LEVEL_DEFAULT_VALUE = "INFO";
     protected final Logger logger = Logger.getLogger(getClass().getName());
     private Level debugLevel = Level.FINE;
     private Level traceLevel = Level.FINER;
     private Level infoLevel = Level.INFO;
+    protected boolean enabled = true;
 
     @Override
     public void postConstruct(@Nonnull Map<String, String> settings) {
+        enabled = getBoolean(settings, SETTING_ENABLED, true);
         String logLevel = getString(settings, SETTING_LOG_LEVEL, SETTING_LOG_LEVEL_DEFAULT_VALUE);
         if ("TRACE".equalsIgnoreCase(logLevel) || "FINEST".equalsIgnoreCase(logLevel)) {
             infoLevel = Level.INFO;

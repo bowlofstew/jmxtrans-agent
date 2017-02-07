@@ -60,7 +60,6 @@ public class GraphitePlainTextTcpOutputWriter extends AbstractOutputWriter imple
     @Override
     public void postConstruct(Map<String, String> settings) {
         super.postConstruct(settings);
-
         graphiteServerHostAndPort = new HostAndPort(
                 getString(settings, SETTING_HOST),
                 getInt(settings, SETTING_PORT, SETTING_PORT_DEFAULT_VALUE));
@@ -75,11 +74,13 @@ public class GraphitePlainTextTcpOutputWriter extends AbstractOutputWriter imple
 
     @Override
     public void writeInvocationResult(@Nonnull String invocationName, @Nullable Object value) throws IOException {
+        if(!enabled) return;
         writeQueryResult(invocationName, null, value);
     }
 
     @Override
     public void writeQueryResult(@Nonnull String metricName, @Nullable String type, @Nullable Object value) throws IOException {
+        if(!enabled) return;
         String msg = messageBuilder.buildMessage(metricName, value, TimeUnit.SECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS));
         try {
             ensureGraphiteConnection();
@@ -132,6 +133,7 @@ public class GraphitePlainTextTcpOutputWriter extends AbstractOutputWriter imple
 
     @Override
     public void postCollect() throws IOException {
+        if(!enabled) return;
         if (writer == null) {
             return;
         }
@@ -155,6 +157,7 @@ public class GraphitePlainTextTcpOutputWriter extends AbstractOutputWriter imple
     
     @Override
     public void preDestroy() {
+        if(!enabled) return;
         super.preDestroy();
         releaseGraphiteConnection();
     }

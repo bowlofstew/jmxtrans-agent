@@ -64,6 +64,7 @@ public class RollingFileOutputWriter extends AbstractOutputWriter {
     @Override
     public synchronized void postConstruct(Map<String, String> settings) {
         super.postConstruct(settings);
+        if(!enabled) return;
         TimeZone tz = TimeZone.getTimeZone("UTC");
         dfISO8601.setTimeZone(tz);
         file = new File(getString(settings, SETTING_FILE_NAME, SETTING_FILE_NAME_DEFAULT_VALUE));
@@ -96,10 +97,12 @@ public class RollingFileOutputWriter extends AbstractOutputWriter {
 
     @Override
     public void writeInvocationResult(String invocationName, Object value) throws IOException {
+        if(!enabled) return;
         writeQueryResult(invocationName, null, value);
     }
 
     public synchronized void writeQueryResult(@Nonnull String name, @Nullable String type, @Nullable Object value) throws IOException {
+        if(!enabled) return;
         try {
             if (singleLine) {
                 if (firstResult) {
@@ -135,6 +138,7 @@ public class RollingFileOutputWriter extends AbstractOutputWriter {
 
     @Override
     public synchronized void preCollect() throws IOException {
+        if(!enabled) return;
         if (singleLine) {
             firstResult = true;
             getTemporaryFileWriter().write("["+dfISO8601.format(Calendar.getInstance().getTime()) +"] ");
@@ -143,6 +147,7 @@ public class RollingFileOutputWriter extends AbstractOutputWriter {
 
     @Override
     public synchronized void postCollect() throws IOException {
+        if(!enabled) return;
         try {
             if (singleLine) {
                 getTemporaryFileWriter().write("\n");

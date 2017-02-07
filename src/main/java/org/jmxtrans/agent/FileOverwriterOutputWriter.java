@@ -57,6 +57,7 @@ public class FileOverwriterOutputWriter extends AbstractOutputWriter {
     @Override
     public synchronized void postConstruct(Map<String, String> settings) {
         super.postConstruct(settings);
+        if(!enabled) return;
         dfISO8601.setTimeZone(TimeZone.getTimeZone("GMT"));
         file = new File(getString(settings, SETTING_FILE_NAME, SETTING_FILE_NAME_DEFAULT_VALUE));
         showTimeStamp = getBoolean(settings, SETTING_SHOW_TIMESTAMP, SETTING_SHOW_TIMESTAMP_DEFAULT);
@@ -81,10 +82,12 @@ public class FileOverwriterOutputWriter extends AbstractOutputWriter {
 
     @Override
     public void writeInvocationResult(String invocationName, Object value) throws IOException {
+        if(!enabled) return;
         writeQueryResult(invocationName, null, value);
     }
 
     public synchronized void writeQueryResult(@Nonnull String name, @Nullable String type, @Nullable Object value) throws IOException {
+        if(!enabled) return;
         try {
             if (showTimeStamp){
                 getTemporaryFileWriter().write("["+dfISO8601.format(Calendar.getInstance().getTime()) +"] "+name + " " + value + "\n");
@@ -116,6 +119,7 @@ public class FileOverwriterOutputWriter extends AbstractOutputWriter {
 
     @Override
     public synchronized void postCollect() throws IOException {
+        if(!enabled) return;
         try {
             getTemporaryFileWriter().close();
             if (logger.isLoggable(getDebugLevel()))

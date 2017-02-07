@@ -57,7 +57,7 @@ public class StatsDOutputWriter extends AbstractOutputWriter implements OutputWr
     @Override
     public synchronized void postConstruct(Map<String, String> settings) {
         super.postConstruct(settings);
-
+        if(!enabled) return;
         final String host = ConfigurationUtils.getString(settings, SETTING_HOST);
         final Integer port = ConfigurationUtils.getInt(settings, SETTING_PORT);
         metricNamePrefix = ConfigurationUtils.getString(settings, SETTING_ROOT_PREFIX, getHostName().replaceAll("\\.", "_"));
@@ -99,17 +99,20 @@ public class StatsDOutputWriter extends AbstractOutputWriter implements OutputWr
 
     @Override
     public void postCollect() throws IOException {
+        if(!enabled) return;
         // Ensure data flush
         flush();
     }
 
     @Override
     public void writeInvocationResult(String invocationName, Object value) throws IOException {
+        if(!enabled) return;
         writeQueryResult(invocationName, null, value);
     }
 
     @Override
     public synchronized void writeQueryResult(String metricName, String metricType, Object value) throws IOException {
+        if(!enabled) return;
         String type = "gauge".equalsIgnoreCase(metricType) || "g".equalsIgnoreCase(metricType) ? "g" : "c";
         String stats = metricNamePrefix + "." + metricName + ":" + value + "|" + type + "\n";
         if (logger.isLoggable(getDebugLevel())) {

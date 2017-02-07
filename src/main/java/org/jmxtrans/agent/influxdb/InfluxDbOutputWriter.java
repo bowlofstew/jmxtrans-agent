@@ -75,6 +75,8 @@ public class InfluxDbOutputWriter extends AbstractOutputWriter {
 
     @Override
     public void postConstruct(Map<String, String> settings) {
+        super.postConstruct(settings);
+        if(!enabled) return;
         String urlStr = ConfigurationUtils.getString(settings, "url");
         database = ConfigurationUtils.getString(settings, "database");
         user = ConfigurationUtils.getString(settings, "user", null);
@@ -118,11 +120,13 @@ public class InfluxDbOutputWriter extends AbstractOutputWriter {
 
     @Override
     public void writeInvocationResult(String invocationName, Object value) throws IOException {
+        if(!enabled) return;
         writeQueryResult(invocationName, null, value);
     }
 
     @Override
     public void writeQueryResult(String metricName, String metricType, Object value) throws IOException {
+        if(!enabled) return;
         InfluxMetric metric = InfluxMetricConverter.convertToInfluxMetric(metricName, value, tags,
                 clock.getCurrentTimeMillis());
         batchedMetrics.add(metric);
@@ -130,6 +134,7 @@ public class InfluxDbOutputWriter extends AbstractOutputWriter {
 
     @Override
     public void postCollect() throws IOException {
+        if(!enabled) return;
         String body = convertMetricsToLines(batchedMetrics);
         String queryString = buildQueryString();
         if (logger.isLoggable(getTraceLevel())) {
